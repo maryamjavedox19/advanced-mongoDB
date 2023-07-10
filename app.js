@@ -26,6 +26,11 @@ connectToDb((err) => {   //its going to connect to db for us
 
 // routes
 app.get('/books', (req, res)=>{
+
+   // current page
+   const page = req.query.p || 0  //if page parameter doesn't have value then value should be 0(first page)
+   const booksPerPage = 3
+
     let books = []
 
     db.collection('books')
@@ -33,6 +38,9 @@ app.get('/books', (req, res)=>{
       .find()            //find method returns us something as cursor. with use method on cursor we can do smth like foreach or toarray
        //it fetch docuents in batches like 100 in each batch then it will fetch another batch    
       .sort({author: 1})    //sort alphabetically by author name
+      .skip(page * booksPerPage)   //so it would skip 3 pages bcs we have already showed 3 pages now it will show rest
+      .limit(booksPerPage)    //rest of 3
+
     //   cursor method
       .forEach(book => books.push(book))
       .then(() => {
